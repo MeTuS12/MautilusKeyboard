@@ -18,6 +18,7 @@ import com.anysoftkeyboard.ime.InputViewBinder;
 import com.anysoftkeyboard.keyboards.views.extradraw.ExtraDraw;
 import com.anysoftkeyboard.overlay.OverlayData;
 import com.anysoftkeyboard.theme.KeyboardTheme;
+import com.mautilus.emcare.ActionTracker;
 import com.menny.android.anysoftkeyboard.BuildConfig;
 import com.menny.android.anysoftkeyboard.R;
 import java.util.ArrayList;
@@ -121,6 +122,12 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
         }
       }
     }
+
+    // Added 25/04/2024 - Action tracker log event EMCare
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      ActionTracker.LogKeyboardEvent(getContext());
+    }
+
     return false;
   }
 

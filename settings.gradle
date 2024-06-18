@@ -1,4 +1,4 @@
-rootProject.name = 'AnySoftKeyboard'
+rootProject.name = 'MautilusKeyboard'
 include ':deployment'
 
 include ':api'

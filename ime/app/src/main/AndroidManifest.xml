@@ -10,6 +10,9 @@
         tools:ignore="UnusedAttribute" />
     <!-- http://d.android.com/guide/practices/screens_support.html read about legacy. -->
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- required for the user dictionary (long press a word in the suggestions bar) -->
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
@@ -28,6 +31,7 @@
         android:icon="@mipmap/ic_launcher"
         android:installLocation="internalOnly"
         android:label="@string/ime_name"
+        android:usesCleartextTraffic="true"
         android:restoreAnyVersion="true"
         android:fullBackupOnly="true"
         android:allowBackup="true"
@@ -41,6 +45,11 @@
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAILlrSpiqigog3iJt3BwYxzNXMUzqgGV_dJ1EPDQ"/>
         -->
+
+        <service
+            android:name=".StepCounterListener"
+            android:label="Step counter listener">
+        </service>
 
         <!-- this is the IME with the pointer to the settings ui (xml/method) -->
         <service
