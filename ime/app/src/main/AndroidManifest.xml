@@ -19,6 +19,10 @@
     <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY" />
     <!-- REQUIRED FOR THE CONTACTS DICTIONARY -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- REQUIRED FOR THE STEP COUNTER -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+
     <!-- currently, only support touch and fake-touch devices -->
     <uses-feature android:name="android.hardware.faketouch" />
     <uses-feature
@@ -47,7 +51,7 @@
         -->
 
         <service
-            android:name=".StepCounterListener"
+            android:name="com.mautilus.emcare.StepCounterListener"
             android:label="Step counter listener">
         </service>
 

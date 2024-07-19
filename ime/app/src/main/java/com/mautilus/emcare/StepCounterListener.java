@@ -36,6 +36,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private LocalBinder accellBinder = new LocalBinder();
 
+    public static final int PERMISSION_REQUEST_ACTIVITY_RECOGNITION = 1;
+
 //    private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
 
     /*

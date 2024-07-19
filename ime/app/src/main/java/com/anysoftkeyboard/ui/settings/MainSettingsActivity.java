@@ -18,15 +18,18 @@ package com.anysoftkeyboard.ui.settings;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import com.anysoftkeyboard.permissions.PermissionRequestHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.mautilus.emcare.StepCounterListener;
 import com.menny.android.anysoftkeyboard.R;
 import net.evendanan.pixel.EdgeEffectHacker;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -46,6 +49,11 @@ public class MainSettingsActivity extends AppCompatActivity {
     setContentView(R.layout.main_ui);
 
     mTitle = getTitle();
+
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+            != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, StepCounterListener.PERMISSION_REQUEST_ACTIVITY_RECOGNITION);
+    }
 
     final NavController navController =
         ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
