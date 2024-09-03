@@ -3,7 +3,8 @@ import java.util.stream.Collectors
 
 group 'net.evendanan'
 
-ext.override_app_id = 'com.menny.android.anysoftkeyboard'
+//ext.override_app_id = 'com.menny.android.anysoftkeyboard'
+ext.override_app_id = 'com.mautilus.keyboard'
 ext.shouldBePublished = true
 ext.override_release_key_alias = 'anysoftkeyboard'
 ext.closedTestingTrackName = 'alpha'

@@ -45,7 +45,8 @@ import androidx.core.app.ActivityCompat;
 
 public class PushData {
 
-    public static final String URL_PUSH_SERVER = "http://82.223.70.174:80/esclerosis/api/v1/push";
+    public static final String URL_PUSH_SERVER = "https://dataendpoint.mautilus.org/esclerosis/api/v1/push";
+//    public static final String URL_PUSH_SERVER = "http://82.223.70.174:80/esclerosis/api/v1/push";
 
     private SQLiteDatabase db;
 
