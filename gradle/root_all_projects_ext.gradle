@@ -5,7 +5,7 @@ allprojects {
 
         sideBySideNdkVersion = '23.0.7599858'
 
-        sdkTargetVersion = 33
+        sdkTargetVersion = 34
         sdkCompileVersion = 34
         sdkMinimumVersion = 15
 

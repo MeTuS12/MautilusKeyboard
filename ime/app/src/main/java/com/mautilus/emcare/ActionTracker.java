@@ -44,6 +44,7 @@ public class ActionTracker {
 
         values.put(Action.FIELD_TYPE_NAME, KEYBOARD_EVENT_TYPE);
 
+
         // Ponemos el tiempo según corresponda.
         Calendar nowInstance = Calendar.getInstance();
         Date currentTimeMin = nowInstance.getTime();
