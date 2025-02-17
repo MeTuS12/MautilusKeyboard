@@ -1,6 +1,5 @@
 ---
 name: checks
-
 on:
   push:
     paths-ignore:
@@ -13,37 +12,51 @@ on:
       - deployment/halt_deployment_marker
     branches:
       - '*'
-
 env:
   TERM: dumb
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: ".github_cache_gradle/user_home/"
   GRADLE_HOME: ".github_cache_gradle/gradle_home/"
   TMPDIR: "/tmp"
-
 jobs:
+  bazel:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: bazel-contrib/setup-bazel@0.9.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+      - run: bazel query //...
+      - run: bazel build //...
+      - run: bazel test --build_tests_only //...
+      - name: internal checkers
+        run: bazel run //js/checkers -- --root_dir "${{ github.workspace }}"
+      - name: Github Action Linter
+        run: bazel run @multitool//tools/actionlint:cwd -- -config-file "${{ github.workspace }}/.github/actionlint.yaml"
+      - name: Code formatting
+        run: |
+          bazel run //:format
+          if [[ $(git status --porcelain) ]]; then echo "**** run 'bazel run //:format' to fix formatting errors"; exit 1; fi
   js-checks:
-    runs-on: ubuntu-22.04
+    # Test js code, since we have not migrated to bazel yet
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 2
       - uses: pnpm/action-setup@v4.0.0
         with:
-          version: 8.6.9
           run_install: true
       - uses: actions/setup-node@v4.1.0
         with:
           node-version-file: ".nvmrc"
           cache: 'pnpm'
-      - run: pnpm lint
-      - run: pnpm pretty
-      - run: pnpm build
       - run: pnpm test
-
   static-checks:
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_ndk:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android:1.21.2
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4.2.2
@@ -52,15 +65,13 @@ jobs:
       - uses: actions/cache@v4.1.2
         with:
           path: .github_cache_gradle/
-          key: global-v9-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          key: global-v11-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
-            global-v9
+            global-v11-
       - name: setup
         run: ./scripts/ci/ci_setup.sh
       - name: check
         run: ./scripts/ci/ci_check.sh
-      - name: check-all-yamls
-        run: ./scripts/ci/ci_check_yamls.sh
       - name: verify-version-classes-greps
         run: ./scripts/ci/third-party-update/verify-third-party-update-greps.sh
       - name: fix-fs
@@ -77,10 +88,9 @@ jobs:
         with:
           name: checks-reports
           path: collected_reports
-
   linters:
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_ndk:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android:1.21.2
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4.2.2
@@ -89,9 +99,9 @@ jobs:
       - uses: actions/cache@v4.1.2
         with:
           path: .github_cache_gradle/
-          key: global-v9-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          key: global-v11-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
-            global-v9
+            global-v11-
       - name: setup
         run: ./scripts/ci/ci_setup.sh
       - name: check
@@ -129,10 +139,9 @@ jobs:
         with:
           name: linters-reports
           path: collected_reports
-
   tests:
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_ndk:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android:1.21.2
     timeout-minutes: 15
     strategy:
       matrix:
@@ -158,10 +167,10 @@ jobs:
       - uses: actions/cache@v4.1.2
         with:
           path: .github_cache_gradle/
-          key: tests-v9-${{ matrix.actual_shard }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          key: tests-v11-${{ matrix.actual_shard }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
-            tests-v9-${{ matrix.actual_shard }}
-            global-v9
+            tests-v11-${{ matrix.actual_shard }}-
+            global-v11-
       - name: setup
         run: ./scripts/ci/ci_setup.sh
       - name: setup robolectric
@@ -192,10 +201,9 @@ jobs:
         with:
           name: tests-build-logging-${{ matrix.shard_variant }}
           path: build/build-logging
-
   deploy-dry-run:
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_ndk:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android:1.21.2
     timeout-minutes: 30
     env:
       KEY_STORE_FILE_PASSWORD: password
@@ -216,10 +224,10 @@ jobs:
       - uses: actions/cache@v4.1.2
         with:
           path: .github_cache_gradle/
-          key: deploy-v9-${{ matrix.shard_type }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          key: deploy-v11-${{ matrix.shard_type }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
-            deploy-v9-${{ matrix.shard_type }}
-            global-v9
+            deploy-v11-${{ matrix.shard_type }}-
+            global-v11
       - name: setup
         run: ./scripts/ci/ci_setup.sh
       - name: generate projects list for sharding
@@ -264,19 +272,17 @@ jobs:
         with:
           name: fdroid-metadata-dry-run-${{ matrix.shard_type }}
           path: outputs/fdroid
-
   all-green-requirement:
-    needs: [static-checks, linters, tests, deploy-dry-run, js-checks]
-    runs-on: ubuntu-22.04
+    needs: [static-checks, linters, tests, deploy-dry-run, js-checks, bazel]
+    runs-on: ubuntu-24.04
     steps:
       - name: ready
         run: echo "DONE"
-
   deploy-request:
     if: github.event_name == 'push'
     needs: [all-green-requirement]
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_base:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android:1.21.2
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -289,12 +295,11 @@ jobs:
           new_deploy: true
           api_username: ${{ secrets.BOT_MASTER_RW_GITHUB_USERNAME }}
           api_token: ${{ secrets.BOT_MASTER_RW_GITHUB_TOKEN }}
-
   merge-to-main:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release-branch-')
     needs: [all-green-requirement]
-    runs-on: ubuntu-22.04
-    container: ghcr.io/menny/android_base:1.20.0
+    runs-on: ubuntu-24.04
+    container: ghcr.io/menny/android_base:1.21.2
     steps:
       - uses: actions/checkout@v4.2.2
         with:

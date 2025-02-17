@@ -308,7 +308,8 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
   }
 
   public interface StripActionProvider {
-    @NonNull View inflateActionView(@NonNull ViewGroup parent);
+    @NonNull
+    View inflateActionView(@NonNull ViewGroup parent);
 
     void onRemoved();
   }
