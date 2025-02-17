@@ -122,7 +122,7 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
     }
 
     // Added 25/04/2024 - Action tracker log event EMCare
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
       ActionTracker.LogKeyboardEvent(getContext());
     }
 
