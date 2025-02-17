@@ -41,7 +41,7 @@ public class Parameters {
 
     public Parameters(Integer id, String type, String time) {
         this.id = id;
-        this.key = key;
-        this.value = value;
+        this.key = type;
+        this.value = time;
     }
 }

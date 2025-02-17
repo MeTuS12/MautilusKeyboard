@@ -1,7 +1,5 @@
 package com.mautilus.emcare.entity;
 
-import java.util.Date;
-
 public class Action {
 
     public static final int STEP_COUNT_EVENT = 17;

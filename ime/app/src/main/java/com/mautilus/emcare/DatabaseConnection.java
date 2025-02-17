@@ -10,7 +10,7 @@ public class DatabaseConnection {
     private final static int version = 1;
 
     static SQLiteDatabase getDatabase(Context context) {
-        SQLiteHelper conn = new SQLiteHelper(context, "db_em_local", null, version);
+        SQLiteHelper conn = new SQLiteHelper(context, DATABASE_NAME, null, version);
         return conn.getWritableDatabase();
     }
 

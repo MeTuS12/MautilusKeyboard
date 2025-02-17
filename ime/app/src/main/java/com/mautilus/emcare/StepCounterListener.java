@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.mautilus.emcare.entity.Action;
+import com.menny.android.anysoftkeyboard.BuildConfig;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,11 +31,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static String TAG = "EMCARE STEP COUNTER";
 
     private final static int TYPE_STEPS = 3;
-    private final static int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 12345;
 
-    private static int steps;
-
-    private LocalBinder accellBinder = new LocalBinder();
+    private final LocalBinder accelerationBinder = new LocalBinder();
 
     public static final int PERMISSION_REQUEST_ACTIVITY_RECOGNITION = 1;
 
@@ -51,7 +49,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
      * running before using it.
      */
     private boolean started = false;
-    private boolean registered = false;
 
 
     @Override
@@ -64,8 +61,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("EMCARE STEP COUNTER", "On Start");
-        synchronized(this) {
-            if(started) {
+        synchronized (this) {
+            if (started) {
                 return START_STICKY;
             }
 
@@ -73,7 +70,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
             // Nos suscribimos al sensor
-            registered = mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            boolean registered = mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
             started = true;
             Log.i("EMCARE STEP COUNTER", "Suscribed!");
             Log.i("EMCARE STEP COUNTER", String.valueOf(registered));
@@ -84,7 +81,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     @Override
     public IBinder onBind(Intent intent) {
-        return accellBinder;
+        return accelerationBinder;
     }
 
 
@@ -112,13 +109,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
     @Override
     public void onSensorChanged(final SensorEvent event) {
         Log.i("EMCARE STEP COUNTER", "Sensor Changed!!");
-        if (event.values[0] > Integer.MAX_VALUE) {
+        if (!(event.values[0] > Integer.MAX_VALUE)) {
 
-//            if (BuildConfig.DEBUG) Log.i(TAG, "probably not a real value: " + event.values[0]);
-
-        } else {
-
-            steps = (int) event.values[0];
+            int steps = (int) event.values[0];
 
             SQLiteDatabase db = DatabaseConnection.getDatabase(getApplicationContext());
 
@@ -132,8 +125,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
             Date currentTimeMin = nowInstance.getTime();
             values.put(Action.FIELD_TIME_NAME, currentTimeMin.getTime());
 
-            Long id = db.insert(Action.TABLE_NAME, Action.FIELD_ID_NAME, values);
+            db.insert(Action.TABLE_NAME, Action.FIELD_ID_NAME, values);
 
+        } else {
+            if (BuildConfig.DEBUG) Log.i(TAG, "probably not a real value: " + event.values[0]);
         }
     }
 

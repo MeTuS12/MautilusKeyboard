@@ -10,9 +10,9 @@ import com.mautilus.emcare.entity.Parameters;
 public class ParametersHelper {
 
 
-    private String[] columns = {Parameters.FIELD_ID_NAME, Parameters.FIELD_KEY_NAME, Parameters.FIELD_VALUE_NAME};
+    private final String[] columns = {Parameters.FIELD_ID_NAME, Parameters.FIELD_KEY_NAME, Parameters.FIELD_VALUE_NAME};
 
-    private SQLiteDatabase db;
+    private final SQLiteDatabase db;
 
     public ParametersHelper(Context appContext) {
         db = DatabaseConnection.getDatabase(appContext);
@@ -36,7 +36,7 @@ public class ParametersHelper {
         return cursor.getString(2);
     }
 
-    public void  set(String key, String value) {
+    public void set(String key, String value) {
         Cursor cursor = getByKey(key);
         int count = cursor.getCount();
 

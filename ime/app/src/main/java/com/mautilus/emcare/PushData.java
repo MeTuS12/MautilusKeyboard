@@ -1,19 +1,13 @@
 package com.mautilus.emcare;
 
-import android.Manifest;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.telephony.TelephonyManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.mautilus.emcare.entity.Action;
@@ -30,59 +24,53 @@ import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 
 public class PushData {
 
     public static final String URL_PUSH_SERVER = "https://dataendpoint.mautilus.org/esclerosis/api/v1/push";
-//    public static final String URL_PUSH_SERVER = "http://82.223.70.174:80/esclerosis/api/v1/push";
 
     private SQLiteDatabase db;
-
     public JobService job = null;
     public JobParameters jobParameters = null;
 
-    ParametersHelper parameters = null;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void endJobService() {
         if (job != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                job.jobFinished(jobParameters, false);
-            }
+            job.jobFinished(jobParameters, false);
         }
     }
 
+    private static final class BasicAuthenticator extends Authenticator {
 
-    private final class BasicAuthenticator extends Authenticator {
-        private String user = "android";
-        private String password = "MttamtNMmBtf4RcXjN7LxQmP8jZntmaEn3h2zEaHR92Judxrk3pKyre2gWv35ge2vi2yVRXBq9adj5gBA5NWMEf5kTFjq5XUezxL";
-
+        @Override
         protected PasswordAuthentication getPasswordAuthentication() {
+            String user = "android";
+            String password = "MttamtNMmBtf4RcXjN7LxQmP8jZntmaEn3h2zEaHR92Judxrk3pKyre2gWv35ge2vi2yVRXBq9adj5gBA5NWMEf5kTFjq5XUezxL";
             return new PasswordAuthentication(user, password.toCharArray());
         }
     }
 
-    private class PushTask extends AsyncTask<String, String, String> {
+    private class PushTask implements Runnable {
+        private final Context context;
+        private final JSONArray json;
+        private String key;
 
-        Context context;
-        JSONArray json;
-        String key;
+        public PushTask(Context context, JSONArray json, String key) {
+            this.context = context;
+            this.json = json;
+            this.key = key;
+        }
 
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        protected String doInBackground(String... urls) {
-            // We make the connection
+        @Override
+        public void run() {
             try {
                 if (key == null) {
                     key = RetrieveKeyFromContentProvider();
@@ -90,20 +78,13 @@ public class PushData {
                     params.set("KEY", key);
                 }
 
-
                 Log.i("PUSH", "A");
-                // Creamos la conexión
                 URL url = new URL(URL_PUSH_SERVER);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                Authenticator.setDefault(new BasicAuthenticator());
 
-                // Definimos la autenticación básica
-                Authenticator.setDefault(new PushData.BasicAuthenticator());
-
-                // Generamos el cuerpo del post
                 Map<String, Object> params = new LinkedHashMap<>();
-                // Metemos los datos codificados en JSON en "data"
                 params.put("data", json.toString());
-                // Usamos el teléfono de clave individual
                 params.put("key", key);
                 Log.i("PUSH", "B");
 
@@ -125,12 +106,11 @@ public class PushData {
 
                 Log.i("PUSH", "D");
                 Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-                String response = "";
-                Log.i("PUSH", "E");
-
-                for (int c; (c = in.read()) >= 0; )
-                    response += (char) c;
-
+                StringBuilder response = new StringBuilder();
+                for (int c; (c = in.read()) >= 0;) {
+                    response.append((char) c);
+                }
+                Log.i("PUSH_RESPONSE", response.toString());
 
             } catch (IOException e) {
                 Log.i("PUSH", "Connection exception");
@@ -139,44 +119,30 @@ public class PushData {
 
             db.execSQL("DELETE FROM " + Action.TABLE_NAME);
             endJobService();
-            return null;
         }
 
-        protected String RetrieveKeyFromContentProvider()
-        {
-            // Definir la URI del Content Provider de la aplicación A
+        private String RetrieveKeyFromContentProvider() {
             Uri contentUri = Uri.parse("content://com.mautilus.emcare.key.provider");
-
-            // Obtener el Content Resolver
             ContentResolver resolver = context.getContentResolver();
-
-            // Realizar una consulta al Content Provider de la aplicación A para obtener la key
             Cursor cursor = resolver.query(contentUri, null, null, null, null);
 
-            // Verificar si se obtuvo un resultado
             if (cursor != null && cursor.moveToFirst()) {
-                // Obtener el valor de la key desde el cursor
                 String key = cursor.getString(cursor.getColumnIndexOrThrow("Key"));
-                Log.d("AppB", "Key obtenida desde App A: " + key);
-
-                // Cerrar el cursor
+                Log.d("AppB", "Key retrieved from App A: " + key);
                 cursor.close();
 
                 ParametersHelper params = new ParametersHelper(context);
                 params.set("KEY", key);
-
-                return  key;
+                return key;
             } else {
                 return null;
             }
         }
     }
 
-
     public JSONArray cursorToJSONArray(Cursor cursor) {
         JSONArray resultSet = new JSONArray();
         cursor.moveToFirst();
-
         while (!cursor.isAfterLast()) {
             int totalColumn = cursor.getColumnCount();
             JSONObject rowObject = new JSONObject();
@@ -184,68 +150,45 @@ public class PushData {
                 if (cursor.getColumnName(i) != null) {
                     try {
                         String str = cursor.getString(i);
-                        if (str.length() > 0) {
+                        if (!str.isEmpty()) {
                             rowObject.put(cursor.getColumnName(i), str);
                         }
                     } catch (Exception e) {
-//                        Log.d(TAG, e.getMessage());
+                        // Log if needed
                     }
                 }
             }
             resultSet.put(rowObject);
             cursor.moveToNext();
         }
-
         cursor.close();
         return resultSet;
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public boolean push(Context appContext, String key) {
-
-        String[] columns = {Action.FIELD_TYPE_NAME, Action.FIELD_TIME_NAME, Action.FIELD_TIME_START_NAME, Action.FIELD_ADDED_NAME, Action.FIELD_REMOVED_NAME};
-        JSONArray json;
-
+    public void push(Context appContext, String key) {
+        String[] columns = {
+                Action.FIELD_TYPE_NAME,
+                Action.FIELD_TIME_NAME,
+                Action.FIELD_TIME_START_NAME,
+                Action.FIELD_ADDED_NAME,
+                Action.FIELD_REMOVED_NAME
+        };
         db = DatabaseConnection.getDatabase(appContext);
-
         Cursor cursor = db.query(Action.TABLE_NAME, columns, null, null, null, null, null);
-        int count = cursor.getCount();
 
-        if (count == 0) {
+        if (cursor.getCount() == 0) {
+            cursor.close();
             endJobService();
-            return true;
+            return;
         }
 
-        json = cursorToJSONArray(cursor);
-
-        PushTask task = new PushTask();
-        task.json = json;
-        task.key = key;
-        task.context = appContext;
-        task.execute();
-
-        // Limpiamos la DDBB
-//        db.execSQL("DELETE FROM " + Action.TABLE_NAME);
-
-        return true;
+        JSONArray json = cursorToJSONArray(cursor);
+        PushTask task = new PushTask(appContext, json, key);
+        executor.execute(task);
     }
 
-
-//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-//    public void update(Context context) {
-//        parameters = new ParametersHelper(context);
-//
-//        String key = parameters.get("KEY");
-//
-//        push(context, key);
-//
-//
-//    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void update(Context context) {
-        parameters = new ParametersHelper(context);
+        ParametersHelper parameters = new ParametersHelper(context);
         String nextSyncStr = parameters.get("TEXT_SYNC");
 
         if (nextSyncStr == null) {
@@ -257,21 +200,16 @@ public class PushData {
 
         Calendar nowInstance = Calendar.getInstance();
         Date currentTimeMin = nowInstance.getTime();
-        Date nextSync = new Date(Long.valueOf(nextSyncStr));
+        Date nextSync = new Date(Long.parseLong(nextSyncStr));
 
         if (currentTimeMin.after(nextSync)) {
             String key = parameters.get("KEY");
-
             push(context, key);
 
             nowInstance.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(10, 16));
             parameters.set("TEXT_SYNC", String.valueOf(nowInstance.getTime().getTime()));
 
-            // Iniciamos el servicio de recogida de pasos
             context.startService(new Intent(context, StepCounterListener.class));
-
         }
-
     }
-
 }

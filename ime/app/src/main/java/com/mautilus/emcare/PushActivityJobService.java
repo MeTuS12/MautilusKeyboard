@@ -11,18 +11,16 @@ import java.util.Date;
 import androidx.annotation.RequiresApi;
 
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class PushActivityJobService extends JobService {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
-        String key = "";
         PushData push = new PushData();
 
         // Obtenemos la clave
         ParametersHelper parameters = new ParametersHelper(getApplicationContext());
-        key = parameters.get("KEY");
+        var key = parameters.get("KEY");
 
         if (key != null) {
             push.job = this;
@@ -35,7 +33,6 @@ public class PushActivityJobService extends JobService {
         parameters.set("PROCESS", "true");
         Date currentTime = Calendar.getInstance().getTime();
         parameters.set("PROCESS_LAST_EXEC", currentTime.toString());
-
 
 //        jobFinished(jobParameters, false);
         return true;

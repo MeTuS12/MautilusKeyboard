@@ -11,8 +11,6 @@ import androidx.annotation.Nullable;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
-    private static SQLiteHelper helper = null;
-
     public SQLiteHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
