@@ -35,6 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PushData {
 
     public static final String URL_PUSH_SERVER = "https://dataendpoint.mautilus.org/esclerosis/api/v1/push";
+    public static final String URL_CONTENT_PROVIDER = "content://com.mautilus.emcare.key.provider";
 
     private SQLiteDatabase db;
     public JobService job = null;
@@ -122,7 +123,7 @@ public class PushData {
         }
 
         private String RetrieveKeyFromContentProvider() {
-            Uri contentUri = Uri.parse("content://com.mautilus.emcare.key.provider");
+            Uri contentUri = Uri.parse(URL_CONTENT_PROVIDER);
             ContentResolver resolver = context.getContentResolver();
             Cursor cursor = resolver.query(contentUri, null, null, null, null);
 
