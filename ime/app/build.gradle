@@ -100,6 +100,7 @@ dependencies {
     implementation project(':addons:base')
     implementation project(':addons:languages:english:pack')
     implementation project(':addons:languages:spain:pack')
+    implementation project(':addons:languages:german:pack')
     implementation project(':ime:base')
     implementation project(':ime:base-rx')
     implementation project(':ime:nextword')
