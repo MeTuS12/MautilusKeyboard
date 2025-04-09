@@ -1,13 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+        xmlns:tools="http://schemas.android.com/tools">
 
     <supports-screens
-        android:anyDensity="true"
-        android:largeScreens="true"
-        android:normalScreens="true"
-        android:smallScreens="true"
-        android:xlargeScreens="true"
-        tools:ignore="UnusedAttribute" />
+            android:anyDensity="true"
+            android:largeScreens="true"
+            android:normalScreens="true"
+            android:smallScreens="true"
+            android:xlargeScreens="true"
+            tools:ignore="UnusedAttribute" />
     <!-- http://d.android.com/guide/practices/screens_support.html read about legacy. -->
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,27 +21,27 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- REQUIRED FOR THE STEP COUNTER -->
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <!-- currently, only support touch and fake-touch devices -->
     <uses-feature android:name="android.hardware.faketouch" />
     <uses-feature
-        android:name="android.hardware.touchscreen"
-        android:required="false" />
+            android:name="android.hardware.touchscreen"
+            android:required="false" />
 
     <application
-        android:name=".AnyApplication"
-        android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
-        android:installLocation="internalOnly"
-        android:label="@string/ime_name"
-        android:usesCleartextTraffic="true"
-        android:restoreAnyVersion="true"
-        android:fullBackupOnly="true"
-        android:allowBackup="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/Theme.AskApp"
-        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+            android:name=".AnyApplication"
+            android:hardwareAccelerated="true"
+            android:icon="@mipmap/ic_launcher"
+            android:installLocation="internalOnly"
+            android:label="@string/ime_name"
+            android:usesCleartextTraffic="true"
+            android:restoreAnyVersion="true"
+            android:fullBackupOnly="true"
+            android:allowBackup="true"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:theme="@style/Theme.AskApp"
+            tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <!-- used to backup the settings and SQL to the cloud -->
         <!--
@@ -51,24 +51,23 @@
         -->
 
         <service
-            android:name="com.mautilus.emcare.StepCounterListener"
-            android:label="Step counter listener">
-        </service>
+                android:name="com.mautilus.emcare.StepCounterListener"
+                android:label="Step counter listener" />
 
         <!-- this is the IME with the pointer to the settings ui (xml/method) -->
         <service
-            android:name=".SoftKeyboard"
-            android:label="@string/ime_name"
-            android:exported="true"
-            android:directBootAware="true"
-            android:permission="android.permission.BIND_INPUT_METHOD">
+                android:name=".SoftKeyboard"
+                android:label="@string/ime_name"
+                android:exported="true"
+                android:directBootAware="true"
+                android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
 
             <meta-data
-                android:name="android.view.im"
-                android:resource="@xml/method" />
+                    android:name="android.view.im"
+                    android:resource="@xml/method" />
         </service>
 
         <!-- ui activities -->
@@ -76,51 +75,57 @@
         <!-- this is just a proxy activity, it does nothing but direct to the actual setting activity
         I use this, so I can 'disable' this activity at runtime, and so remove ASK from the launcher's icons -->
         <activity
-            android:exported="true"
-            android:name="com.menny.android.anysoftkeyboard.LauncherSettingsActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/ime_name"
-            android:launchMode="singleTop"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.AskApp">
+                android:exported="true"
+                android:name="com.menny.android.anysoftkeyboard.LauncherSettingsActivity"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/ime_name"
+                android:launchMode="singleTop"
+                android:roundIcon="@mipmap/ic_launcher_round"
+                android:theme="@style/Theme.AskApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.mautilus.keyboard.SEND_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
             <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
+                    android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name="com.anysoftkeyboard.ui.settings.MainSettingsActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/ime_name"
-            android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.AskApp"
-            android:windowSoftInputMode="adjustPan" />
+                android:name="com.anysoftkeyboard.ui.settings.MainSettingsActivity"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/ime_name"
+                android:launchMode="singleTask"
+                android:roundIcon="@mipmap/ic_launcher_round"
+                android:theme="@style/Theme.AskApp"
+                android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.anysoftkeyboard.ui.settings.setup.SetupWizardActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/ime_name"
-            android:launchMode="singleTask"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.AskApp.NoTitle.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
+                android:name="com.anysoftkeyboard.ui.settings.setup.SetupWizardActivity"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/ime_name"
+                android:launchMode="singleTask"
+                android:roundIcon="@mipmap/ic_launcher_round"
+                android:theme="@style/Theme.AskApp.NoTitle.NoActionBar"
+                android:windowSoftInputMode="adjustPan" />
         <!-- ui when a crash happens -->
         <activity
-            android:name="com.anysoftkeyboard.ui.SendBugReportUiActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/ime_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/Theme.AskApp.NoTitle" />
+                android:name="com.anysoftkeyboard.ui.SendBugReportUiActivity"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/ime_name"
+                android:roundIcon="@mipmap/ic_launcher_round"
+                android:theme="@style/Theme.AskApp.NoTitle" />
 
         <activity
-            android:name="com.anysoftkeyboard.ui.VoiceInputNotInstalledActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/ime_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+                android:name="com.anysoftkeyboard.ui.VoiceInputNotInstalledActivity"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/ime_name"
+                android:roundIcon="@mipmap/ic_launcher_round"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
     </application>
 
@@ -150,7 +155,7 @@
 
         <!-- other IMEs -->
         <intent>
-            <action android:name="android.view.InputMethod"/>
+            <action android:name="android.view.InputMethod" />
         </intent>
     </queries>
 </manifest>
