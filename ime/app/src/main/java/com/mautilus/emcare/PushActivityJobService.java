@@ -25,7 +25,7 @@ public class PushActivityJobService extends JobService {
         if (key != null) {
             push.job = this;
             push.jobParameters = jobParameters;
-            push.push(getApplicationContext(), key);
+            push.push(getApplicationContext());
         } else {
             return false;
         }

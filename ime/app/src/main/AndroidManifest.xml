@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY" />
     <!-- REQUIRED FOR THE CONTACTS DICTIONARY -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+<!--    <uses-permission android:name="android.permission.READ_CONTACTS" />-->
 
     <!-- REQUIRED FOR THE STEP COUNTER -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>

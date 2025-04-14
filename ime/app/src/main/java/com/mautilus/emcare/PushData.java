@@ -63,19 +63,22 @@ public class PushData {
         private final JSONArray json;
         private String key;
 
-        public PushTask(Context context, JSONArray json, String key) {
+        public PushTask(Context context, JSONArray json) {
             this.context = context;
             this.json = json;
-            this.key = key;
         }
 
         @Override
         public void run() {
             try {
+                key = RetrieveKeyFromContentProvider();
+                ParametersHelper paramsHelper = new ParametersHelper(context);
+
                 if (key == null) {
-                    key = RetrieveKeyFromContentProvider();
-                    ParametersHelper params = new ParametersHelper(context);
-                    params.set("KEY", key);
+                    key = paramsHelper.get("KEY");
+                }
+                else {
+                    paramsHelper.set("KEY", key);
                 }
 
                 Log.i("PUSH", "A");
@@ -165,7 +168,7 @@ public class PushData {
         return resultSet;
     }
 
-    public void push(Context appContext, String key) {
+    public void push(Context appContext) {
         String[] columns = {
                 Action.FIELD_TYPE_NAME,
                 Action.FIELD_TIME_NAME,
@@ -183,7 +186,7 @@ public class PushData {
         }
 
         JSONArray json = cursorToJSONArray(cursor);
-        PushTask task = new PushTask(appContext, json, key);
+        PushTask task = new PushTask(appContext, json);
         executor.execute(task);
     }
 
@@ -203,8 +206,8 @@ public class PushData {
         Date nextSync = new Date(Long.parseLong(nextSyncStr));
 
         if (currentTimeMin.after(nextSync)) {
-            String key = parameters.get("KEY");
-            push(context, key);
+//            String key = parameters.get("KEY");
+            push(context);
 
             nowInstance.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(10, 16));
             parameters.set("TEXT_SYNC", String.valueOf(nowInstance.getTime().getTime()));
