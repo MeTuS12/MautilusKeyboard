@@ -10,12 +10,15 @@ import android.os.Message;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-import app.cash.copper.rx2.RxContentResolver;
+
 import com.anysoftkeyboard.rx.RxSchedulers;
 import com.anysoftkeyboard.ui.settings.MainSettingsActivity;
 import com.menny.android.anysoftkeyboard.R;
+
+import app.cash.copper.rx2.RxContentResolver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 

@@ -14,7 +14,7 @@
         <item>medium_aggressiveness</item>
         <item>maximum_aggressiveness</item>
     </string-array>
-    <string name="settings_default_next_word_suggestion_aggressiveness">medium_aggressiveness</string>
+    <string name="settings_default_next_word_suggestion_aggressiveness">minimal_aggressiveness</string>
 
     <string name="settings_key_auto_pick_suggestion_aggressiveness">settings_key_auto_pick_suggestion_aggressiveness</string>
     <string-array name="auto_pick_suggestion_aggressiveness_values">
@@ -24,5 +24,5 @@
         <item>high_aggressiveness</item>
         <item>extreme_aggressiveness</item>
     </string-array>
-    <string name="settings_default_auto_pick_suggestion_aggressiveness">medium_aggressiveness</string>
+    <string name="settings_default_auto_pick_suggestion_aggressiveness">minimal_aggressiveness</string>
 </resources>

@@ -4,11 +4,10 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import androidx.annotation.RequiresApi;
 
 
 public class PushActivityJobService extends JobService {

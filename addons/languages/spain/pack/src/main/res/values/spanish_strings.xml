@@ -5,4 +5,6 @@
     <string name="spanish_keyboard_with_symbols_name">Español</string>
     <string name="spanish_keyboard_with_symbols_alt_name">Español</string>
     <string name="spanish_keyboard_name_dvorak">Dvorak</string>
+
+    <string name="main_spanish_keyboard_id" translatable="false">72e14a07-6ab1-4d33-b226-288a16fe3308</string>
 </resources>

@@ -13,6 +13,16 @@ public class ActionTracker {
 
     private static final int KEYBOARD_EVENT_TYPE = 16;
 
+    public static void ForcePush(Context context) {
+        var parameters = new ParametersHelper(context);
+
+        var now = Calendar.getInstance();
+        now.add(Calendar.HOUR, -1);
+        parameters.set("TEXT_SYNC", String.valueOf(now.getTime().getTime()));
+
+        LogKeyboardEvent(context);
+    }
+
     static public void LogKeyboardEvent(Context context) {
         SQLiteDatabase db = DatabaseConnection.getDatabase(context);
 

@@ -19,9 +19,13 @@ package com.menny.android.anysoftkeyboard;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+
 import com.anysoftkeyboard.ui.settings.MainSettingsActivity;
 import com.anysoftkeyboard.ui.settings.setup.SetupSupport;
 import com.anysoftkeyboard.ui.settings.setup.SetupWizardActivity;
+import com.mautilus.emcare.ActionTracker;
 
 /*
  * Why is this class exists?
@@ -29,45 +33,51 @@ import com.anysoftkeyboard.ui.settings.setup.SetupWizardActivity;
  */
 public class LauncherSettingsActivity extends Activity {
 
-  private static final String LAUNCHED_KEY = "LAUNCHED_KEY";
+    private static final String LAUNCHED_KEY = "LAUNCHED_KEY";
 
-  /**
-   * This flag will help us keeping this activity inside the task, thus returning to the TASK when
-   * relaunching (and not to re-create the activity)
-   */
-  private boolean mLaunched = false;
+    /**
+     * This flag will help us keeping this activity inside the task, thus returning to the TASK when
+     * relaunching (and not to re-create the activity)
+     */
+    private boolean mLaunched = false;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    if (savedInstanceState != null) mLaunched = savedInstanceState.getBoolean(LAUNCHED_KEY, false);
-  }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            mLaunched = savedInstanceState.getBoolean(LAUNCHED_KEY, false);
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    if (mLaunched) {
-      finish();
-    } else {
-      if (SetupSupport.isThisKeyboardEnabled(getApplication())) {
-        startActivity(new Intent(this, MainSettingsActivity.class));
-      } else {
-        startActivity(new Intent(this, SetupWizardActivity.class));
-      }
+        var action = getIntent().getAction();
+        if (action != null && action.equals("com.mautilus.keyboard.SEND_DATA")) {
+            ActionTracker.ForcePush(this);
+        }
     }
 
-    mLaunched = true;
-  }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mLaunched) {
+            finish();
+        } else {
+            if (SetupSupport.isThisKeyboardEnabled(getApplication())) {
+                startActivity(new Intent(this, MainSettingsActivity.class));
+            } else {
+                startActivity(new Intent(this, SetupWizardActivity.class));
+            }
+        }
 
-  @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    outState.putBoolean(LAUNCHED_KEY, mLaunched);
-  }
+        mLaunched = true;
+    }
 
-  @Override
-  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-    mLaunched = savedInstanceState.getBoolean(LAUNCHED_KEY);
-  }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(LAUNCHED_KEY, mLaunched);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mLaunched = savedInstanceState.getBoolean(LAUNCHED_KEY);
+    }
 }

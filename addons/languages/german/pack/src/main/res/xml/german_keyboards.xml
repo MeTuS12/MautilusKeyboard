@@ -2,7 +2,7 @@
 <Keyboards>
     <Keyboard
         defaultDictionaryLocale="de"
-        defaultEnabled="true"
+        defaultEnabled="false"
         description="@string/de_keyboard_description"
         iconResId="@drawable/ic_status_german"
         id="5a1b25da-c17d-4be1-ad8e-3e24333341ec"
