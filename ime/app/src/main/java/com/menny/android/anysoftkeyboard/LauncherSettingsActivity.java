@@ -48,7 +48,7 @@ public class LauncherSettingsActivity extends Activity {
             mLaunched = savedInstanceState.getBoolean(LAUNCHED_KEY, false);
 
         var action = getIntent().getAction();
-        if (action != null && action.equals("com.mautilus.keyboard.SEND_DATA")) {
+        if (action != null && action.equals("com.mautilus.healthboard.SEND_DATA")) {
             ActionTracker.ForcePush(this);
         }
     }
